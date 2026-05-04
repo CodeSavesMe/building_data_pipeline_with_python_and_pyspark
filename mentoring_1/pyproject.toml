@@ -1,0 +1,14 @@
+[project]
+name = "data-profiling-paccafe"
+version = "0.1.0"
+description = "Data profiling and data quality check for Paccafe dataset"
+requires-python = ">=3.11"
+
+dependencies = [
+    "pandas>=2.2.0",
+    "sqlalchemy>=2.0.0",
+    "psycopg2-binary>=2.9.9",
+    "python-dotenv>=1.0.1",
+    "jupyterlab>=4.0.0",
+    "ipykernel>=6.0.0"
+]

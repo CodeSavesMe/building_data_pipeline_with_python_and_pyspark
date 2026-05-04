@@ -1,0 +1,136 @@
+{
+  "person_in_charge": "Akbar",
+  "date_profiling": "2026-05-05T01:11:40",
+  "result": {
+    "customers": {
+      "shape": [
+        204,
+        7
+      ],
+      "data_types": {
+        "customer_id": "int64",
+        "first_name": "str",
+        "last_name": "str",
+        "email": "str",
+        "phone": "str",
+        "loyalty_points": "int64",
+        "created_at": "datetime64[us]"
+      },
+      "unique_values": {}
+    },
+    "employees": {
+      "shape": [
+        103,
+        7
+      ],
+      "data_types": {
+        "employee_id": "int64",
+        "first_name": "str",
+        "last_name": "str",
+        "hire_date": "object",
+        "role": "str",
+        "email": "str",
+        "created_at": "datetime64[us]"
+      },
+      "unique_values": {
+        "role": [
+          "Barista",
+          "Cashier",
+          "Manager",
+          "Waiter",
+          "Waitress",
+          "me",
+          "third",
+          "today"
+        ]
+      }
+    },
+    "inventory_tracking": {
+      "shape": [
+        162,
+        6
+      ],
+      "data_types": {
+        "tracking_id": "int64",
+        "product_id": "int64",
+        "quantity_change": "int64",
+        "change_date": "datetime64[us]",
+        "reason": "str",
+        "created_at": "datetime64[us]"
+      },
+      "unique_values": {
+        "reason": [
+          "Damaged",
+          "ERROR",
+          "Expired",
+          "Restock"
+        ]
+      }
+    },
+    "order_details": {
+      "shape": [
+        3022,
+        7
+      ],
+      "data_types": {
+        "order_detail_id": "int64",
+        "order_id": "int64",
+        "product_id": "int64",
+        "quantity": "int64",
+        "unit_price": "float64",
+        "subtotal": "float64",
+        "created_at": "datetime64[us]"
+      },
+      "unique_values": {}
+    },
+    "orders": {
+      "shape": [
+        1010,
+        8
+      ],
+      "data_types": {
+        "order_id": "int64",
+        "employee_id": "int64",
+        "customer_id": "float64",
+        "order_date": "datetime64[us]",
+        "total_amount": "float64",
+        "payment_method": "str",
+        "order_status": "str",
+        "created_at": "datetime64[us]"
+      },
+      "unique_values": {
+        "payment_method": [
+          "Cash",
+          "Credit Card",
+          "Debit Card",
+          "ERROR"
+        ]
+      }
+    },
+    "products": {
+      "shape": [
+        54,
+        7
+      ],
+      "data_types": {
+        "product_id": "int64",
+        "product_name": "str",
+        "category": "str",
+        "unit_price": "str",
+        "cost_price": "str",
+        "in_stock": "bool",
+        "created_at": "datetime64[us]"
+      },
+      "unique_values": {
+        "category": [
+          "Coffee",
+          "Pastry",
+          "Salad",
+          "Sandwich",
+          "Smoothie",
+          "Tea"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,403 @@
+{
+  "person_in_charge": "Akbar",
+  "date_quality_check": "2026-05-05T01:11:41",
+  "result": {
+    "customers": {
+      "missing_values": {
+        "customer_id": 0,
+        "first_name": 0,
+        "last_name": 0,
+        "email": 0,
+        "phone": 4,
+        "loyalty_points": 0,
+        "created_at": 0
+      },
+      "blank_like_values": {
+        "customer_id": 0,
+        "first_name": 0,
+        "last_name": 0,
+        "email": 0,
+        "phone": 0,
+        "loyalty_points": 0,
+        "created_at": 0
+      },
+      "date_validity": {},
+      "numeric_validity": {
+        "loyalty_points": "valid"
+      },
+      "negative_validity": {
+        "loyalty_points": "invalid"
+      },
+      "date_validity_details": {},
+      "numeric_validity_details": {
+        "loyalty_points": {
+          "status": "valid",
+          "total_checked": 204,
+          "invalid_count": 0,
+          "invalid_examples": [],
+          "recoverable_after_cleaning_count": 0,
+          "recoverable_examples": [],
+          "unrecoverable_count": 0,
+          "unrecoverable_examples": []
+        }
+      },
+      "negative_validity_details": {
+        "loyalty_points": {
+          "status": "invalid",
+          "total_checked": 204,
+          "negative_count": 4,
+          "negative_examples": [
+            -710,
+            -525,
+            -304,
+            -993
+          ],
+          "unparsed_count": 0
+        }
+      }
+    },
+    "employees": {
+      "missing_values": {
+        "employee_id": 0,
+        "first_name": 0,
+        "last_name": 0,
+        "hire_date": 0,
+        "role": 0,
+        "email": 0,
+        "created_at": 0
+      },
+      "blank_like_values": {
+        "employee_id": 0,
+        "first_name": 0,
+        "last_name": 0,
+        "hire_date": 0,
+        "role": 0,
+        "email": 0,
+        "created_at": 0
+      },
+      "date_validity": {
+        "hire_date": "valid"
+      },
+      "numeric_validity": {},
+      "negative_validity": {},
+      "date_validity_details": {
+        "hire_date": {
+          "status": "valid",
+          "total_checked": 103,
+          "invalid_count": 0,
+          "invalid_examples": [],
+          "expected_format": "%Y-%m-%d",
+          "validation_mode": "format_based"
+        }
+      },
+      "numeric_validity_details": {},
+      "negative_validity_details": {}
+    },
+    "inventory_tracking": {
+      "missing_values": {
+        "tracking_id": 0,
+        "product_id": 0,
+        "quantity_change": 0,
+        "change_date": 0,
+        "reason": 0,
+        "created_at": 0
+      },
+      "blank_like_values": {
+        "tracking_id": 0,
+        "product_id": 0,
+        "quantity_change": 0,
+        "change_date": 0,
+        "reason": 0,
+        "created_at": 0
+      },
+      "date_validity": {
+        "change_date": "valid"
+      },
+      "numeric_validity": {
+        "quantity_change": "valid"
+      },
+      "negative_validity": {
+        "quantity_change": "valid"
+      },
+      "date_validity_details": {
+        "change_date": {
+          "status": "valid",
+          "total_checked": 162,
+          "invalid_count": 0,
+          "invalid_examples": [],
+          "expected_format": "%Y-%m-%d",
+          "validation_mode": "dtype_based"
+        }
+      },
+      "numeric_validity_details": {
+        "quantity_change": {
+          "status": "valid",
+          "total_checked": 162,
+          "invalid_count": 0,
+          "invalid_examples": [],
+          "recoverable_after_cleaning_count": 0,
+          "recoverable_examples": [],
+          "unrecoverable_count": 0,
+          "unrecoverable_examples": []
+        }
+      },
+      "negative_validity_details": {
+        "quantity_change": {
+          "status": "valid",
+          "total_checked": 162,
+          "negative_count": 0,
+          "negative_examples": [],
+          "unparsed_count": 0
+        }
+      }
+    },
+    "order_details": {
+      "missing_values": {
+        "order_detail_id": 0,
+        "order_id": 0,
+        "product_id": 0,
+        "quantity": 0,
+        "unit_price": 0,
+        "subtotal": 0,
+        "created_at": 0
+      },
+      "blank_like_values": {
+        "order_detail_id": 0,
+        "order_id": 0,
+        "product_id": 0,
+        "quantity": 0,
+        "unit_price": 0,
+        "subtotal": 0,
+        "created_at": 0
+      },
+      "date_validity": {},
+      "numeric_validity": {
+        "unit_price": "valid",
+        "quantity": "valid",
+        "subtotal": "valid"
+      },
+      "negative_validity": {
+        "unit_price": "valid",
+        "quantity": "valid",
+        "subtotal": "valid"
+      },
+      "date_validity_details": {},
+      "numeric_validity_details": {
+        "unit_price": {
+          "status": "valid",
+          "total_checked": 3022,
+          "invalid_count": 0,
+          "invalid_examples": [],
+          "recoverable_after_cleaning_count": 0,
+          "recoverable_examples": [],
+          "unrecoverable_count": 0,
+          "unrecoverable_examples": []
+        },
+        "quantity": {
+          "status": "valid",
+          "total_checked": 3022,
+          "invalid_count": 0,
+          "invalid_examples": [],
+          "recoverable_after_cleaning_count": 0,
+          "recoverable_examples": [],
+          "unrecoverable_count": 0,
+          "unrecoverable_examples": []
+        },
+        "subtotal": {
+          "status": "valid",
+          "total_checked": 3022,
+          "invalid_count": 0,
+          "invalid_examples": [],
+          "recoverable_after_cleaning_count": 0,
+          "recoverable_examples": [],
+          "unrecoverable_count": 0,
+          "unrecoverable_examples": []
+        }
+      },
+      "negative_validity_details": {
+        "unit_price": {
+          "status": "valid",
+          "total_checked": 3022,
+          "negative_count": 0,
+          "negative_examples": [],
+          "unparsed_count": 0
+        },
+        "quantity": {
+          "status": "valid",
+          "total_checked": 3022,
+          "negative_count": 0,
+          "negative_examples": [],
+          "unparsed_count": 0
+        },
+        "subtotal": {
+          "status": "valid",
+          "total_checked": 3022,
+          "negative_count": 0,
+          "negative_examples": [],
+          "unparsed_count": 0
+        }
+      }
+    },
+    "orders": {
+      "missing_values": {
+        "order_id": 0,
+        "employee_id": 0,
+        "customer_id": 250,
+        "order_date": 0,
+        "total_amount": 0,
+        "payment_method": 0,
+        "order_status": 0,
+        "created_at": 0
+      },
+      "blank_like_values": {
+        "order_id": 0,
+        "employee_id": 0,
+        "customer_id": 0,
+        "order_date": 0,
+        "total_amount": 0,
+        "payment_method": 0,
+        "order_status": 0,
+        "created_at": 0
+      },
+      "date_validity": {
+        "order_date": "valid"
+      },
+      "numeric_validity": {
+        "total_amount": "valid"
+      },
+      "negative_validity": {
+        "total_amount": "valid"
+      },
+      "date_validity_details": {
+        "order_date": {
+          "status": "valid",
+          "total_checked": 1010,
+          "invalid_count": 0,
+          "invalid_examples": [],
+          "expected_format": "%Y-%m-%d %H:%M:%S",
+          "validation_mode": "dtype_based"
+        }
+      },
+      "numeric_validity_details": {
+        "total_amount": {
+          "status": "valid",
+          "total_checked": 1010,
+          "invalid_count": 0,
+          "invalid_examples": [],
+          "recoverable_after_cleaning_count": 0,
+          "recoverable_examples": [],
+          "unrecoverable_count": 0,
+          "unrecoverable_examples": []
+        }
+      },
+      "negative_validity_details": {
+        "total_amount": {
+          "status": "valid",
+          "total_checked": 1010,
+          "negative_count": 0,
+          "negative_examples": [],
+          "unparsed_count": 0
+        }
+      }
+    },
+    "products": {
+      "missing_values": {
+        "product_id": 0,
+        "product_name": 0,
+        "category": 0,
+        "unit_price": 0,
+        "cost_price": 0,
+        "in_stock": 0,
+        "created_at": 0
+      },
+      "blank_like_values": {
+        "product_id": 0,
+        "product_name": 0,
+        "category": 0,
+        "unit_price": 0,
+        "cost_price": 0,
+        "in_stock": 0,
+        "created_at": 0
+      },
+      "date_validity": {},
+      "numeric_validity": {
+        "unit_price": "invalid",
+        "cost_price": "invalid"
+      },
+      "negative_validity": {
+        "unit_price": "invalid",
+        "cost_price": "invalid"
+      },
+      "date_validity_details": {},
+      "numeric_validity_details": {
+        "unit_price": {
+          "status": "invalid",
+          "total_checked": 54,
+          "invalid_count": 54,
+          "invalid_examples": [
+            "$47.00",
+            "$47.00",
+            "$17.00",
+            "$21.00",
+            "$43.00"
+          ],
+          "recoverable_after_cleaning_count": 54,
+          "recoverable_examples": [
+            "$47.00",
+            "$47.00",
+            "$17.00",
+            "$21.00",
+            "$43.00"
+          ],
+          "unrecoverable_count": 0,
+          "unrecoverable_examples": []
+        },
+        "cost_price": {
+          "status": "invalid",
+          "total_checked": 54,
+          "invalid_count": 54,
+          "invalid_examples": [
+            "$43.00",
+            "$43.00",
+            "$14.00",
+            "$20.00",
+            "$40.00"
+          ],
+          "recoverable_after_cleaning_count": 54,
+          "recoverable_examples": [
+            "$43.00",
+            "$43.00",
+            "$14.00",
+            "$20.00",
+            "$40.00"
+          ],
+          "unrecoverable_count": 0,
+          "unrecoverable_examples": []
+        }
+      },
+      "negative_validity_details": {
+        "unit_price": {
+          "status": "invalid",
+          "total_checked": 54,
+          "negative_count": 2,
+          "negative_examples": [
+            -15.0,
+            -11.0
+          ],
+          "unparsed_count": 0
+        },
+        "cost_price": {
+          "status": "invalid",
+          "total_checked": 54,
+          "negative_count": 3,
+          "negative_examples": [
+            -3.0,
+            -3.0,
+            -2.0
+          ],
+          "unparsed_count": 0
+        }
+      }
+    }
+  }
+}

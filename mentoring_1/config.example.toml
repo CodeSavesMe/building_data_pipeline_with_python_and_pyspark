@@ -1,0 +1,167 @@
+# ==============================================
+# Data Profiling & Data Quality Configuration
+# Pacmann AI - Data Pipeline Paccafe
+# ==============================================
+
+[project]
+name = "data-profiling-data-quality-paccafe"
+description = "Data profiling and data quality check for Paccafe sales dataset"
+person_in_charge = "Akbar"
+timezone = "Asia/Jakarta"
+
+
+# ----------------------------------------------
+# Project Paths
+# ----------------------------------------------
+
+[paths]
+repository_dir = "data_pipeline_paccafe"
+task_file = "task_mentoring_week1.md"
+docker_compose_file = "data_pipeline_paccafe/docker-compose.yaml"
+init_sql_file = "data_pipeline_paccafe/source_data/init.sql"
+
+notebook_dir = "notebooks"
+notebook_path = "notebooks/data_profiling_quality_check.ipynb"
+
+output_dir = "outputs"
+profiling_report_path = "outputs/data_profiling_report.json"
+quality_report_path = "outputs/data_quality_report.json"
+
+
+# ----------------------------------------------
+# Database Configuration
+# Sesuaikan dengan docker-compose.yaml jika berbeda
+# ----------------------------------------------
+
+[database]
+db_type = "postgresql"
+host = "localhost"
+port = 5433
+database = "paccafe"
+username = "postgres"
+password = "postgres"
+schema = "public"
+
+
+# ----------------------------------------------
+# Data Profiling Configuration
+# ----------------------------------------------
+
+[profiling]
+enable_list_tables = true
+enable_extract_data = true
+enable_shape_check = true
+enable_data_type_check = true
+enable_unique_value_check = true
+enable_report = true
+
+[profiling.unique_values]
+
+[profiling.unique_values.employees]
+columns = ["role"]
+
+[profiling.unique_values.orders]
+columns = ["payment_method"]
+
+[profiling.unique_values.products]
+columns = ["category"]
+
+# Alias "inventory" dipakai oleh notebook untuk table inventory_tracking.
+[profiling.unique_values.inventory]
+columns = ["reason"]
+
+
+# ----------------------------------------------
+# Data Quality Configuration
+# ----------------------------------------------
+
+[data_quality]
+enable_missing_value_check = true
+enable_date_validation = true
+enable_numeric_validation = true
+enable_negative_value_validation = true
+enable_report = true
+
+[data_quality.missing_values]
+check_all_tables = true
+
+
+# ----------------------------------------------
+# Date Validation
+# Format mengikuti Python datetime format
+# ----------------------------------------------
+
+[data_quality.date_validation]
+
+[data_quality.date_validation.employees]
+hire_date = "%Y-%m-%d"
+
+[data_quality.date_validation.inventory_tracking]
+change_date = "%Y-%m-%d"
+
+[data_quality.date_validation.orders]
+order_date = "%Y-%m-%d %H:%M:%S"
+
+
+# ----------------------------------------------
+# Numeric Validation
+# ----------------------------------------------
+
+[data_quality.numeric_validation]
+
+[data_quality.numeric_validation.products]
+columns = ["unit_price", "cost_price"]
+
+[data_quality.numeric_validation.orders]
+columns = ["total_amount"]
+
+[data_quality.numeric_validation.order_details]
+columns = ["unit_price", "quantity", "subtotal"]
+
+[data_quality.numeric_validation.inventory_tracking]
+columns = ["quantity_change"]
+
+[data_quality.numeric_validation.customers]
+columns = ["loyalty_points"]
+
+
+# ----------------------------------------------
+# Negative Value Validation
+# ----------------------------------------------
+
+[data_quality.negative_validation]
+
+[data_quality.negative_validation.products]
+columns = ["unit_price", "cost_price"]
+allow_negative = false
+
+[data_quality.negative_validation.orders]
+columns = ["total_amount"]
+allow_negative = false
+
+[data_quality.negative_validation.order_details]
+columns = ["unit_price", "quantity", "subtotal"]
+allow_negative = false
+
+[data_quality.negative_validation.inventory_tracking]
+columns = ["quantity_change"]
+allow_negative = false
+
+[data_quality.negative_validation.customers]
+columns = ["loyalty_points"]
+allow_negative = false
+
+
+# ----------------------------------------------
+# Recommendation Rules
+# ----------------------------------------------
+
+[recommendations]
+enable = true
+
+[recommendations.rules]
+missing_value = "Check missing values and decide whether to fill, drop, or investigate the records."
+invalid_date = "Standardize date values based on the expected format."
+invalid_numeric = "Convert valid numeric strings into numeric data types and investigate invalid values."
+negative_value = "Investigate negative values in columns where negative values are not allowed."
+categorical_standardization = "Standardize categorical values such as role, payment_method, category, and reason."
