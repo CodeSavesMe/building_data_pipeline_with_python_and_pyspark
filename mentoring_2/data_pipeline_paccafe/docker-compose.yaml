@@ -1,0 +1,90 @@
+services:
+  source_db:
+    image: postgres:16
+    container_name: source_db
+    restart: always
+    environment:
+      - POSTGRES_DB=${SRC_POSTGRES_DB}
+      - POSTGRES_USER=${SRC_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${SRC_POSTGRES_PASSWORD}
+    ports:
+      - ${SRC_POSTGRES_PORT}:5432
+    volumes:
+      - ./source_data:/docker-entrypoint-initdb.d
+      - source-volume:/var/lib/postgresql/data
+    networks:
+      - mentoring-networks
+
+  staging_db:
+    image: postgres:16
+    container_name: staging_db
+    restart: always
+    environment:
+      - POSTGRES_DB=${STG_POSTGRES_DB}
+      - POSTGRES_USER=${STG_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${STG_POSTGRES_PASSWORD}
+    ports:
+      - ${STG_POSTGRES_PORT}:5432
+    volumes:
+      - ./staging_data:/docker-entrypoint-initdb.d
+      - staging-volume:/var/lib/postgresql/data
+    networks:
+      - mentoring-networks
+
+  warehouse_db:
+    image: postgres:16
+    container_name: warehouse_db
+    restart: always
+    environment:
+      - POSTGRES_DB=${WH_POSTGRES_DB}
+      - POSTGRES_USER=${WH_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${WH_POSTGRES_PASSWORD}
+    ports:
+      - ${WH_POSTGRES_PORT}:5432
+    volumes:
+      - ./warehouse_data:/docker-entrypoint-initdb.d
+      - warehouse-volume:/var/lib/postgresql/data
+    networks:
+      - mentoring-networks
+
+  log_db:
+    image: postgres:16
+    container_name: log_db
+    restart: always
+    environment:
+      - POSTGRES_DB=${LOG_POSTGRES_DB}
+      - POSTGRES_USER=${LOG_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${LOG_POSTGRES_PASSWORD}
+    ports:
+      - ${LOG_POSTGRES_PORT}:5432
+    volumes:
+      - ./log_data:/docker-entrypoint-initdb.d
+      - log-volume:/var/lib/postgresql/data
+    networks:
+      - mentoring-networks
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio-container
+    restart: always
+    environment:
+      MINIO_ROOT_USER: "${MINIO_ACCESS_KEY}"
+      MINIO_ROOT_PASSWORD: "${MINIO_SECRET_KEY}"
+    command: server --address ":9000" --console-address ":9090" /data
+    ports:
+      - "9000:9000" # API port
+      - "9090:9090" # Console port
+    volumes:
+      - minio_volume:/data
+    networks:
+      - mentoring-networks
+
+volumes:
+  source-volume:
+  staging-volume:
+  warehouse-volume:
+  log-volume:
+  minio_volume:
+
+networks:
+  mentoring-networks:

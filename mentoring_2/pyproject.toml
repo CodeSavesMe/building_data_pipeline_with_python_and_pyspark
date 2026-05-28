@@ -1,0 +1,49 @@
+[project]
+name = "paccafe-pipeline"
+version = "0.1.0"
+description = "PacCafe Source to Staging to Warehouse data pipeline."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+keywords = ["data-pipeline", "etl", "postgresql", "warehouse", "paccafe"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Database",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.scripts]
+paccafe-pipeline = "paccafe_pipeline.orchestration.pipeline:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0",
+]
+notebook = [
+    "ipython>=8.0",
+    "jupyter>=1.0",
+    "nbconvert>=7.0",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.uv]
+package = true
+default-groups = ["dev"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-q"
