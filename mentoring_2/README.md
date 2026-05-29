@@ -1,7 +1,5 @@
 # Mentoring Week 4: PacCafe Data Integration Pipeline
 
-dataclubs.talk cohort notes
-
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
 ![uv](https://img.shields.io/badge/uv-enabled-6E46FF)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-source%20%7C%20staging%20%7C%20warehouse-4169E1?logo=postgresql&logoColor=white)
