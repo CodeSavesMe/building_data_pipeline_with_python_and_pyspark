@@ -10,9 +10,13 @@
 ![uv](https://img.shields.io/badge/uv-Python%20Environment-6E46FF)
 ![Apache Spark](https://img.shields.io/badge/Apache%20Spark-PySpark%20ETL-E25A1C?logo=apachespark)
 
-Repository ini dipakai sebagai workspace latihan mentoring **Building Data Pipeline with Python and PySpark** dari Pacmann. Setiap folder `mentoring_*` menyimpan tugas, kode, notebook, dokumentasi, dan artefak output untuk sesi mentoring terkait.
+This repository serves as a practice workspace for the **Building Data Pipeline with Python and PySpark** mentoring program by Pacmann. Each `mentoring_*` folder contains the tasks, source code, notebooks, documentation, and output artifacts for its respective mentoring session.
 
-Saat ini `mentoring_1`, `mentoring_2`, dan `mentoring_3` sudah berisi implementasi lengkap. `mentoring_1` fokus pada data profiling dan quality check PostgreSQL, `mentoring_2` membangun pipeline ETL lokal dari source database ke staging dan warehouse, sedangkan `mentoring_3` mengimplementasikan pipeline ETL multi-source dengan PySpark dan PostgreSQL Data Warehouse.
+Currently, `mentoring_1`, `mentoring_2`, and `mentoring_3` contain complete implementations:
+
+* **`mentoring_1`**: Focuses on data profiling and quality checks using PostgreSQL.
+* **`mentoring_2`**: Builds a local ETL pipeline from the source database to the staging area and data warehouse.
+* **`mentoring_3`**: Implements a multi-source ETL pipeline utilizing PySpark and a PostgreSQL Data Warehouse.
 
 ## Project Status & Navigation
 
