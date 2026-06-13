@@ -1,0 +1,144 @@
+name: mentoring3-bank-etl
+
+x-postgres-common: &postgres-common
+  image: postgres:16-bookworm
+  restart: unless-stopped
+  networks:
+    - etl_network
+
+x-spark-environment: &spark-environment
+  SOURCE_DB_HOST: source_db
+  SOURCE_DB_PORT: 5432
+  SOURCE_DB_NAME: ${SOURCE_DB_NAME:-source}
+  SOURCE_DB_USER: postgres
+  SOURCE_DB_PASSWORD: ${SOURCE_DB_PASSWORD:-postgres}
+  WAREHOUSE_DB_HOST: data_warehouse
+  WAREHOUSE_DB_PORT: 5432
+  WAREHOUSE_DB_NAME: ${WAREHOUSE_DB_NAME:-data_warehouse}
+  WAREHOUSE_DB_USER: postgres
+  WAREHOUSE_DB_PASSWORD: ${WAREHOUSE_DB_PASSWORD:-postgres}
+  CSV_PATH: /app/data/new_bank_transactions.csv
+  JDBC_DRIVER_PATH: /opt/spark/jars/postgresql-42.6.0.jar
+  LOG_PATH: /app/logs/etl_pipeline.log
+  PROFILE_REPORT_PATH: /app/logs/latest_profile_summary.json
+  SPARK_APP_NAME: bank-etl-pipeline
+  SPARK_MASTER: ${SPARK_MASTER:-local[4]}
+  SPARK_DRIVER_MEMORY: ${SPARK_DRIVER_MEMORY:-1g}
+  SPARK_SHUFFLE_PARTITIONS: ${SPARK_SHUFFLE_PARTITIONS:-8}
+  MAX_VALID_YEAR: ${MAX_VALID_YEAR:-2025}
+  DB_CONNECT_TIMEOUT_SECONDS: ${DB_CONNECT_TIMEOUT_SECONDS:-10}
+  DB_SOCKET_TIMEOUT_SECONDS: ${DB_SOCKET_TIMEOUT_SECONDS:-60}
+  RETRY_ATTEMPTS: ${RETRY_ATTEMPTS:-3}
+  RETRY_INITIAL_DELAY_SECONDS: ${RETRY_INITIAL_DELAY_SECONDS:-2}
+  RETRY_MAX_DELAY_SECONDS: ${RETRY_MAX_DELAY_SECONDS:-15}
+
+x-spark-volumes: &spark-volumes
+  - ./data:/app/data:ro
+  - ./drivers/postgresql-42.6.0.jar:/opt/spark/jars/postgresql-42.6.0.jar:ro
+  - ./logs:/app/logs
+
+services:
+  source_db:
+    <<: *postgres-common
+    hostname: source_db
+    environment:
+      POSTGRES_DB: ${SOURCE_DB_NAME:-source}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${SOURCE_DB_PASSWORD:-postgres}
+    ports:
+      - "${SOURCE_DB_HOST_PORT:-5438}:5432"
+    volumes:
+      - source_db_data:/var/lib/postgresql/data
+      - ./docker/postgres/source/init.sql:/docker-entrypoint-initdb.d/001-source.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ${SOURCE_DB_NAME:-source}"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+
+  data_warehouse:
+    <<: *postgres-common
+    hostname: data_warehouse
+    environment:
+      POSTGRES_DB: ${WAREHOUSE_DB_NAME:-data_warehouse}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${WAREHOUSE_DB_PASSWORD:-postgres}
+    ports:
+      - "${WAREHOUSE_DB_HOST_PORT:-5439}:5432"
+    volumes:
+      - warehouse_db_data:/var/lib/postgresql/data
+      - ./docker/postgres/warehouse/init.sql:/docker-entrypoint-initdb.d/001-warehouse.sql:ro
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U postgres -d ${WAREHOUSE_DB_NAME:-data_warehouse}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+
+  spark_etl:
+    build:
+      context: .
+      target: etl
+    image: mentoring3-bank-etl:latest
+    hostname: spark-etl
+    init: true
+    restart: "no"
+    mem_limit: ${SPARK_CONTAINER_MEMORY:-2g}
+    environment:
+      <<: *spark-environment
+    ports:
+      - "${SPARK_UI_HOST_PORT:-4040}:4040"
+    volumes: *spark-volumes
+    tmpfs:
+      - /tmp:size=1g
+    depends_on:
+      source_db:
+        condition: service_healthy
+      data_warehouse:
+        condition: service_healthy
+    networks:
+      - etl_network
+
+  notebook:
+    profiles: ["eda"]
+    build:
+      context: .
+      target: development
+    image: mentoring3-bank-etl-dev:latest
+    hostname: notebook
+    init: true
+    restart: "no"
+    mem_limit: ${SPARK_CONTAINER_MEMORY:-2g}
+    environment:
+      <<: *spark-environment
+    ports:
+      - "${JUPYTER_HOST_PORT:-8888}:8888"
+      - "${SPARK_UI_HOST_PORT:-4040}:4040"
+    volumes:
+      - ./src:/app/src:ro
+      - ./script:/app/script
+      - ./data:/app/data:ro
+      - ./drivers/postgresql-42.6.0.jar:/opt/spark/jars/postgresql-42.6.0.jar:ro
+      - ./logs:/app/logs
+    tmpfs:
+      - /tmp:size=1g
+    depends_on:
+      source_db:
+        condition: service_healthy
+      data_warehouse:
+        condition: service_healthy
+    networks:
+      - etl_network
+
+volumes:
+  source_db_data:
+  warehouse_db_data:
+
+networks:
+  etl_network:
+    driver: bridge

@@ -1,0 +1,231 @@
+{
+  "run_id": "c0a2e914-b5ac-44db-92a3-6658ed1d2daf",
+  "status": "SUCCEEDED",
+  "started_at": "2026-06-13T18:36:23.672005",
+  "finished_at": "2026-06-13T18:37:23.119222",
+  "duration_seconds": "59.49",
+  "error_message": null,
+  "profiles": [
+    {
+      "stage": "source",
+      "dataset": "education_status",
+      "row_count": 4,
+      "column_count": 4,
+      "null_count": 0,
+      "duplicate_key_count": 0,
+      "null_by_column": {
+        "value": 0,
+        "created_at": 0,
+        "updated_at": 0,
+        "education_id": 0
+      },
+      "previous_row_count": null,
+      "row_count_delta": null
+    },
+    {
+      "stage": "source",
+      "dataset": "marital_status",
+      "row_count": 3,
+      "column_count": 4,
+      "null_count": 0,
+      "duplicate_key_count": 0,
+      "null_by_column": {
+        "value": 0,
+        "created_at": 0,
+        "marital_id": 0,
+        "updated_at": 0
+      },
+      "previous_row_count": null,
+      "row_count_delta": null
+    },
+    {
+      "stage": "source",
+      "dataset": "marketing_campaign_deposit",
+      "row_count": 45211,
+      "column_count": 20,
+      "null_count": 0,
+      "duplicate_key_count": 0,
+      "null_by_column": {
+        "age": 0,
+        "day": 0,
+        "job": 0,
+        "loan": 0,
+        "month": 0,
+        "pdays": 0,
+        "balance": 0,
+        "contact": 0,
+        "default": 0,
+        "housing": 0,
+        "campaign": 0,
+        "duration": 0,
+        "poutcome": 0,
+        "previous": 0,
+        "created_at": 0,
+        "marital_id": 0,
+        "updated_at": 0,
+        "education_id": 0,
+        "loan_data_id": 0,
+        "subscribed_deposit": 0
+      },
+      "previous_row_count": null,
+      "row_count_delta": null
+    },
+    {
+      "stage": "source",
+      "dataset": "new_bank_transactions.csv",
+      "row_count": 1048567,
+      "column_count": 9,
+      "null_count": 3620,
+      "duplicate_key_count": 0,
+      "null_by_column": {
+        "CustGender": 1100,
+        "CustomerID": 0,
+        "CustomerDOB": 0,
+        "CustLocation": 151,
+        "TransactionID": 0,
+        "TransactionDate": 0,
+        "TransactionTime": 0,
+        "CustAccountBalance": 2369,
+        "TransactionAmount (INR)": 0
+      },
+      "previous_row_count": null,
+      "row_count_delta": null
+    },
+    {
+      "stage": "target",
+      "dataset": "customers",
+      "row_count": 1048567,
+      "column_count": 5,
+      "null_count": 5917,
+      "duplicate_key_count": 0,
+      "null_by_column": {
+        "gender": 0,
+        "location": 151,
+        "birth_date": 3397,
+        "customer_id": 0,
+        "account_balance": 2369
+      },
+      "previous_row_count": null,
+      "row_count_delta": null
+    },
+    {
+      "stage": "target",
+      "dataset": "education_status",
+      "row_count": 4,
+      "column_count": 4,
+      "null_count": 0,
+      "duplicate_key_count": 0,
+      "null_by_column": {
+        "value": 0,
+        "created_at": 0,
+        "updated_at": 0,
+        "education_id": 0
+      },
+      "previous_row_count": null,
+      "row_count_delta": null
+    },
+    {
+      "stage": "target",
+      "dataset": "marital_status",
+      "row_count": 3,
+      "column_count": 4,
+      "null_count": 0,
+      "duplicate_key_count": 0,
+      "null_by_column": {
+        "value": 0,
+        "created_at": 0,
+        "marital_id": 0,
+        "updated_at": 0
+      },
+      "previous_row_count": null,
+      "row_count_delta": null
+    },
+    {
+      "stage": "target",
+      "dataset": "marketing_campaign_deposit",
+      "row_count": 45211,
+      "column_count": 21,
+      "null_count": 0,
+      "duplicate_key_count": 0,
+      "null_by_column": {
+        "age": 0,
+        "day": 0,
+        "job": 0,
+        "loan": 0,
+        "month": 0,
+        "balance": 0,
+        "contact": 0,
+        "default": 0,
+        "housing": 0,
+        "campaign": 0,
+        "duration": 0,
+        "created_at": 0,
+        "marital_id": 0,
+        "updated_at": 0,
+        "education_id": 0,
+        "loan_data_id": 0,
+        "duration_in_year": 0,
+        "subscribed_deposit": 0,
+        "days_since_last_campaign": 0,
+        "previous_campaign_outcome": 0,
+        "previous_campaign_contacts": 0
+      },
+      "previous_row_count": null,
+      "row_count_delta": null
+    },
+    {
+      "stage": "target",
+      "dataset": "transactions",
+      "row_count": 1048567,
+      "column_count": 5,
+      "null_count": 0,
+      "duplicate_key_count": 0,
+      "null_by_column": {
+        "customer_id": 0,
+        "transaction_id": 0,
+        "transaction_date": 0,
+        "transaction_time": 0,
+        "transaction_amount": 0
+      },
+      "previous_row_count": null,
+      "row_count_delta": null
+    }
+  ],
+  "changes": [
+    {
+      "dataset": "customers",
+      "inserted": 1048567,
+      "updated": 0,
+      "deleted": 0,
+      "unchanged": 0
+    },
+    {
+      "dataset": "education_status",
+      "inserted": 4,
+      "updated": 0,
+      "deleted": 0,
+      "unchanged": 0
+    },
+    {
+      "dataset": "marital_status",
+      "inserted": 3,
+      "updated": 0,
+      "deleted": 0,
+      "unchanged": 0
+    },
+    {
+      "dataset": "marketing_campaign_deposit",
+      "inserted": 45211,
+      "updated": 0,
+      "deleted": 0,
+      "unchanged": 0
+    },
+    {
+      "dataset": "transactions",
+      "inserted": 1048567,
+      "updated": 0,
+      "deleted": 0,
+      "unchanged": 0
+    }
+  ]
+}
