@@ -40,3 +40,6 @@ dist/
 
 # Logs
 *.log
+
+# External mentoring datasets cloned locally
+mentoring_4/dataset/data_pipeline_exercise_4/

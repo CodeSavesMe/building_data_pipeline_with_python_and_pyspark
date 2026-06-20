@@ -1,0 +1,412 @@
+name: pac_car
+
+x-pipeline-environment: &pipeline-environment
+  DATASET_ROOT: /app/dataset
+  BRAND_REFERENCE_PATH: /app/dataset/car_brand.csv
+  STATE_REFERENCE_PATH: /app/dataset/api_data.json
+  SRC_POSTGRES_HOST: source_db
+  SRC_POSTGRES_PORT: 5432
+  SRC_POSTGRES_DB: source_db
+  SRC_POSTGRES_USER: admin
+  SRC_POSTGRES_PASSWORD: admin
+  STG_POSTGRES_HOST: staging_db
+  STG_POSTGRES_PORT: 5432
+  STG_POSTGRES_DB: staging_db
+  STG_POSTGRES_USER: admin
+  STG_POSTGRES_PASSWORD: admin
+  WH_POSTGRES_HOST: warehouse_db
+  WH_POSTGRES_PORT: 5432
+  WH_POSTGRES_DB: warehouse_db
+  WH_POSTGRES_USER: admin
+  WH_POSTGRES_PASSWORD: admin
+  LOG_POSTGRES_HOST: log_db
+  LOG_POSTGRES_PORT: 5432
+  LOG_POSTGRES_DB: log_db
+  LOG_POSTGRES_USER: admin
+  LOG_POSTGRES_PASSWORD: admin
+  MINIO_ENDPOINT_URL: http://minio:9000
+  MINIO_ACCESS_KEY: admin
+  MINIO_SECRET_KEY: admin1234
+  MINIO_BUCKET_NAME: pac-car-models
+  MLFLOW_TRACKING_URI: http://mlflow:5000
+  MLFLOW_S3_ENDPOINT_URL: http://minio:9000
+  AWS_ACCESS_KEY_ID: admin
+  AWS_SECRET_ACCESS_KEY: admin1234
+  SPARK_MASTER_URL: spark://spark-master:7077
+  ARTIFACT_DIR: /tmp/pac_car_artifacts
+  LOG_DIR: /tmp/pac_car_logs
+  MODEL_TEST_SIZE: 0.2
+  MODEL_RANDOM_SEED: 42
+  PYSPARK_PYTHON: python
+  PYSPARK_DRIVER_PYTHON: python
+  GIT_PYTHON_REFRESH: quiet
+
+x-airflow-common: &airflow-common
+  image: pac_car-airflow:latest
+  build:
+    context: .
+    dockerfile: docker/airflow/Dockerfile
+  environment:
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow_db:5432/airflow
+    AIRFLOW__WEBSERVER__SECRET_KEY: pac_car_airflow_secret
+    AIRFLOW__LOGGING__LOGGING_LEVEL: INFO
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./logs/airflow:/opt/airflow/logs
+    - /var/run/docker.sock:/var/run/docker.sock
+  user: "${AIRFLOW_UID:-50000}:0"
+  depends_on:
+    airflow_db:
+      condition: service_healthy
+  networks:
+    - pac_car_network
+
+services:
+  source_db:
+    image: postgres:16
+    container_name: pac_car_source_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: source_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "15435:5432"
+    volumes:
+      - ../dataset/data_pipeline_exercise_4/source_data:/docker-entrypoint-initdb.d:ro
+      - source_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d source_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pac_car_network
+
+  staging_db:
+    image: postgres:16
+    container_name: pac_car_staging_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: staging_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "15436:5432"
+    volumes:
+      - ../dataset/data_pipeline_exercise_4/staging_data:/docker-entrypoint-initdb.d:ro
+      - staging_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d staging_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pac_car_network
+
+  warehouse_db:
+    image: postgres:16
+    container_name: pac_car_warehouse_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: warehouse_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "15437:5432"
+    volumes:
+      - ../dataset/data_pipeline_exercise_4/warehouse_data:/docker-entrypoint-initdb.d:ro
+      - warehouse_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d warehouse_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pac_car_network
+
+  log_db:
+    image: postgres:16
+    container_name: pac_car_log_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: log_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "15438:5432"
+    volumes:
+      - ../dataset/data_pipeline_exercise_4/log_data:/docker-entrypoint-initdb.d:ro
+      - log_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d log_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pac_car_network
+
+  minio:
+    image: minio/minio:latest
+    container_name: pac_car_minio
+    restart: unless-stopped
+    command: server --address ":9000" --console-address ":9090" /data
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: admin1234
+    ports:
+      - "19004:9000"
+      - "19095:9090"
+    volumes:
+      - minio_volume:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - pac_car_network
+
+  minio_init:
+    image: minio/mc:latest
+    container_name: pac_car_minio_init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 admin admin1234;
+      mc mb -p local/pac-car-models || true;
+      mc mb -p local/pac-car-mlflow || true;
+      exit 0;
+      "
+    networks:
+      - pac_car_network
+
+  spark-master:
+    image: pac_car-spark:latest
+    build:
+      context: ..
+      dockerfile: pac_car/docker/spark/Dockerfile
+    container_name: pac_car_spark_master
+    restart: unless-stopped
+    environment:
+      SPARK_MODE: master
+      SPARK_MASTER_PORT: 7077
+      SPARK_MASTER_WEBUI_PORT: 8080
+    ports:
+      - "17077:7077"
+      - "18081:8080"
+    networks:
+      - pac_car_network
+
+  spark-worker:
+    image: pac_car-spark:latest
+    build:
+      context: ..
+      dockerfile: pac_car/docker/spark/Dockerfile
+    container_name: pac_car_spark_worker
+    restart: unless-stopped
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_WEBUI_PORT: 8081
+      SPARK_WORKER_MEMORY: 2g
+      SPARK_WORKER_CORES: 2
+    depends_on:
+      - spark-master
+    ports:
+      - "18082:8081"
+    networks:
+      - pac_car_network
+
+  pipeline:
+    image: pac_car-pipeline:latest
+    build:
+      context: ..
+      dockerfile: pac_car/docker/pipeline/Dockerfile
+      target: etl
+    container_name: pac_car_pipeline
+    command: ["sleep", "infinity"]
+    environment:
+      <<: *pipeline-environment
+    depends_on:
+      source_db:
+        condition: service_healthy
+      staging_db:
+        condition: service_healthy
+      warehouse_db:
+        condition: service_healthy
+      log_db:
+        condition: service_healthy
+      minio_init:
+        condition: service_completed_successfully
+      spark-master:
+        condition: service_started
+      spark-worker:
+        condition: service_started
+    networks:
+      - pac_car_network
+
+  notebook:
+    image: pac_car-notebook:latest
+    build:
+      context: .
+      dockerfile: docker/notebook/Dockerfile
+    container_name: pac_car_notebook
+    command:
+      - jupyter
+      - lab
+      - --ip=0.0.0.0
+      - --port=8888
+      - --no-browser
+      - --allow-root
+      - --notebook-dir=/app
+      - --ServerApp.token=
+      - --ServerApp.password=
+    environment:
+      <<: *pipeline-environment
+      PYTHONPATH: /app/src
+    volumes:
+      - ./notebooks:/app/notebooks
+      - ./src:/app/src
+      - ./logs:/app/logs
+      - ./artifacts:/app/artifacts
+      - ../dataset:/app/dataset:ro
+    ports:
+      - "18888:8888"
+    depends_on:
+      source_db:
+        condition: service_healthy
+      staging_db:
+        condition: service_healthy
+      warehouse_db:
+        condition: service_healthy
+      log_db:
+        condition: service_healthy
+      minio_init:
+        condition: service_completed_successfully
+      spark-master:
+        condition: service_started
+      spark-worker:
+        condition: service_started
+      mlflow:
+        condition: service_started
+    networks:
+      - pac_car_network
+
+  mlflow:
+    image: pac_car-pipeline:latest
+    build:
+      context: ..
+      dockerfile: pac_car/docker/pipeline/Dockerfile
+      target: etl
+    container_name: pac_car_mlflow
+    restart: unless-stopped
+    command: >
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --allowed-hosts mlflow,mlflow:5000,localhost,localhost:15000,127.0.0.1,127.0.0.1:15000
+      --backend-store-uri sqlite:////mlflow/mlflow.db
+      --default-artifact-root s3://pac-car-mlflow/
+    environment:
+      MLFLOW_S3_ENDPOINT_URL: http://minio:9000
+      AWS_ACCESS_KEY_ID: admin
+      AWS_SECRET_ACCESS_KEY: admin1234
+    volumes:
+      - mlflow_volume:/mlflow
+    ports:
+      - "15000:5000"
+    depends_on:
+      pipeline:
+        condition: service_started
+      minio_init:
+        condition: service_completed_successfully
+    networks:
+      - pac_car_network
+
+  airflow_db:
+    image: postgres:16
+    container_name: pac_car_airflow_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: airflow
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+    volumes:
+      - airflow_db_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow -d airflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pac_car_network
+
+  airflow-init:
+    <<: *airflow-common
+    container_name: pac_car_airflow_init
+    command:
+      - bash
+      - -c
+      - |
+        set -e
+        airflow db migrate
+        airflow users create \
+          --username admin \
+          --password admin \
+          --firstname Pac \
+          --lastname Car \
+          --role Admin \
+          --email admin@example.com \
+          || true
+    depends_on:
+      airflow_db:
+        condition: service_healthy
+
+  airflow-webserver:
+    <<: *airflow-common
+    container_name: pac_car_airflow_webserver
+    restart: unless-stopped
+    command: webserver
+    ports:
+      - "18080:8080"
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: pac_car_airflow_scheduler
+    restart: unless-stopped
+    command: scheduler
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+      pipeline:
+        condition: service_started
+      mlflow:
+        condition: service_started
+
+volumes:
+  source_volume:
+  staging_volume:
+  warehouse_volume:
+  log_volume:
+  minio_volume:
+  mlflow_volume:
+  airflow_db_volume:
+
+networks:
+  pac_car_network:
+    name: pac_car_network
+    driver: bridge

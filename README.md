@@ -9,14 +9,26 @@
 ![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-ORM%20%2F%20Connection-D71F00)
 ![uv](https://img.shields.io/badge/uv-Python%20Environment-6E46FF)
 ![Apache Spark](https://img.shields.io/badge/Apache%20Spark-PySpark%20ETL-E25A1C?logo=apachespark)
+![Apache Airflow](https://img.shields.io/badge/Apache%20Airflow-Orchestration-017CEE?logo=apacheairflow)
+![MLflow](https://img.shields.io/badge/MLflow-Experiment%20Tracking-0194E2?logo=mlflow)
+![MinIO](https://img.shields.io/badge/MinIO-Object%20Storage-C72E49?logo=minio)
 
 This repository serves as a practice workspace for the **Building Data Pipeline with Python and PySpark** mentoring program by Pacmann. Each `mentoring_*` folder contains the tasks, source code, notebooks, documentation, and output artifacts for its respective mentoring session.
 
-Currently, `mentoring_1`, `mentoring_2`, and `mentoring_3` contain complete implementations:
+Currently, `mentoring_1` through `mentoring_4` contain complete implementations:
 
 * **`mentoring_1`**: Focuses on data profiling and quality checks using PostgreSQL.
 * **`mentoring_2`**: Builds a local ETL pipeline from the source database to the staging area and data warehouse.
 * **`mentoring_3`**: Implements a multi-source ETL pipeline utilizing PySpark and a PostgreSQL Data Warehouse.
+* **`mentoring_4`**: Adds an Airflow-orchestrated car sales ETL and machine learning pipeline with MLflow and MinIO.
+
+The Mentoring 4 database dataset comes from an external repository and is intentionally
+not tracked as a nested Git repository. Clone it before starting the stack:
+
+```bash
+git clone https://github.com/Kurikulum-Sekolah-Pacmann/data_pipeline_exercise_4.git \
+  mentoring_4/dataset/data_pipeline_exercise_4
+```
 
 ## Project Status & Navigation
 
@@ -25,22 +37,23 @@ Currently, `mentoring_1`, `mentoring_2`, and `mentoring_3` contain complete impl
 | [`mentoring_1`](./mentoring_1/) | Data profiling notebook, JSON quality reports, PostgreSQL source setup | ✅ Completed |
 | [`mentoring_2`](./mentoring_2/) | Source -> Staging -> Warehouse ETL, PostgreSQL warehouse, MinIO job-failure payload dump, DB check notebook/PDF | ✅ Completed |
 | [`mentoring_3`](./mentoring_3/ans_mentoring3/) | PySpark ETL from PostgreSQL and CSV to PostgreSQL warehouse, profiling, audit history, and semi-CDC | ✅ Completed |
-| `mentoring_4` | Reserved for the next mentoring task | Planned |
+| [`mentoring_4`](./mentoring_4/) | Car sales ETL and ML pipeline with PySpark, Airflow, MLflow, and MinIO | ✅ Completed |
 
 ## Progress Log
 
 - [x] **Mentoring 1** - Data profiling and quality validation on Pacmann source datasets.
 - [x] **Mentoring 2** - Data integration and ETL pipeline with PostgreSQL source, staging, warehouse, logging, MinIO, uv, and database checking notebook/PDF.
 - [x] **Mentoring 3** - Multi-source PySpark ETL with PostgreSQL, CSV, data profiling, audit tables, semi-CDC, centralized logging, and Docker Compose.
-- [ ] **Mentoring 4** - Not started.
+- [x] **Mentoring 4** - Car sales ETL and supervised regression pipeline with PostgreSQL, PySpark, Airflow, MLflow, and MinIO.
 
 ## Current Workspace Snapshot
 
-- `mentoring_1`, `mentoring_2`, and `mentoring_3` are completed project folders.
-- The implementations use Python, pandas, PySpark, SQLAlchemy, PostgreSQL, Docker Compose, uv, MinIO, pytest, and Jupyter Notebook.
+- `mentoring_1` through `mentoring_4` are completed project folders.
+- The implementations use Python, pandas, PySpark, scikit-learn, SQLAlchemy, PostgreSQL, Docker Compose, uv, Airflow, MLflow, MinIO, pytest, and Jupyter Notebook.
 - `mentoring_1` validates source data quality and generates profiling artifacts.
 - `mentoring_2` builds an OOP-style ETL pipeline from source to staging and warehouse, with operational logging and job-failure payload handling.
 - `mentoring_3` integrates PostgreSQL and CSV sources into a PostgreSQL warehouse using PySpark, with profiling, audit history, and batch semi-CDC comparison.
+- `mentoring_4` integrates car sales and reference data into a model-ready warehouse, trains a selling-price regression model, and publishes tracked artifacts.
 
 ## Mentoring 1 Highlights
 
@@ -169,6 +182,59 @@ make check
 make eda
 ```
 
+## Mentoring 4 Highlights
+
+Folder: [`mentoring_4`](./mentoring_4/)
+
+### What It Contains
+
+- End-to-end car sales pipeline from PostgreSQL source to staging and warehouse.
+- Brand mapping from a copied spreadsheet fixture and state mapping from an API-style fixture.
+- PySpark transformation using a locally built Spark master and worker image.
+- Data cleaning, reference joins, validation, deduplication, and rejected-row accounting.
+- Supervised regression with scikit-learn `DecisionTreeRegressor`.
+- Airflow orchestration through `DockerOperator`.
+- MLflow experiment tracking and MinIO model/prediction artifact storage.
+- PostgreSQL ETL audit logs and centralized application logging.
+- Docker-based JupyterLab exploration notebook.
+
+### Main Artifacts
+
+- [`mentoring_4/README.md`](./mentoring_4/README.md) - Mentoring entry point and external dataset setup.
+- [`mentoring_4/pac_car/README.md`](./mentoring_4/pac_car/README.md) - Main documentation and operational runbook.
+- [`mentoring_4/task_mentoring_4.md`](./mentoring_4/task_mentoring_4.md) - Original mentoring task.
+- [`mentoring_4/pac_car/project_explanation.md`](./mentoring_4/pac_car/project_explanation.md) - Beginner-oriented explanation of the architecture and prediction logic.
+- [`mentoring_4/pac_car/report_summary.md`](./mentoring_4/pac_car/report_summary.md) - Latest clean-start validation report.
+- [`mentoring_4/pac_car/notebooks/data_exploration.ipynb`](./mentoring_4/pac_car/notebooks/data_exploration.ipynb) - Executed source and reference data exploration notebook.
+- [`mentoring_4/pac_car/docker-compose.yml`](./mentoring_4/pac_car/docker-compose.yml) - Complete PostgreSQL, Spark, Airflow, MLflow, MinIO, pipeline, and notebook stack.
+
+### Latest Validated Run
+
+The latest full run started from empty Docker volumes on **June 17, 2026 WIB** and completed through Airflow with the `success` state.
+
+| Item | Result |
+| --- | ---: |
+| Source sales rows | 30,000 |
+| Staging sales rows | 30,000 |
+| Warehouse sales rows | 28,818 |
+| Rejected rows | 1,182 |
+| R2 score | 0.9708 |
+| RMSE | 1661.8552 |
+| MAE | 1018.6319 |
+
+The run stored a timestamped model under `s3://pac-car-models/models/` and its test prediction CSV under `s3://pac-car-models/predictions/`.
+
+### Typical Commands
+
+Run these from the repository root:
+
+```bash
+docker compose -f mentoring_4/pac_car/docker-compose.yml up -d --build
+docker compose -f mentoring_4/pac_car/docker-compose.yml exec -T airflow-scheduler \
+  airflow dags trigger pac_car_sales_pipeline
+docker compose -f mentoring_4/pac_car/docker-compose.yml ps
+```
+
 ## Repository Structure
 
 ```text
@@ -207,6 +273,20 @@ data_pipeline_with_python_and_spark/
 │       ├── src/
 │       └── tests/
 └── mentoring_4/
+    ├── README.md
+    ├── task_mentoring_4.md
+    ├── dataset/
+    │   ├── api_data.json
+    │   └── car_brand.csv
+    └── pac_car/
+        ├── README.md
+        ├── docker-compose.yml
+        ├── dags/
+        ├── docker/
+        ├── notebooks/
+        ├── project_explanation.md
+        ├── report_summary.md
+        └── src/
 ```
 
 ## Notes
